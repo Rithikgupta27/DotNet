@@ -1,25 +1,146 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34330.188
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "day9", "day9\day9.csproj", "{C39D5F12-ABD6-4BDD-976F-DFED5AA38CB8}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C39D5F12-ABD6-4BDD-976F-DFED5AA38CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C39D5F12-ABD6-4BDD-976F-DFED5AA38CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C39D5F12-ABD6-4BDD-976F-DFED5AA38CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C39D5F12-ABD6-4BDD-976F-DFED5AA38CB8}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {4CFB8926-3359-4CA0-8272-99D3B3890FA6}
-	EndGlobalSection
-EndGlobal
+using Microsoft.Data.SqlClient;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System;
+using System.Linq.Expressions;
+using System.Data;
+using System.Security.Cryptography;
+
+namespace day9
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            /*Program.connect();*/
+            Employee emps = new Employee(1, "rohil", 250000, 20);
+            /*Insert2(emps);*/
+            Insert4(emps);
+
+        }
+
+        public static void connect()
+        {
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString=@"Data Source=(localdb)\ProjectModels; Initial Catalog = ActsDec2023; Integrated Security = True; Connect Timeout = 30; Encrypt=False; Trust Server Certificate=False; Application Intent = ReadWrite; Multi Subnet Failover=False;MultipleActiveResulSets=true";
+
+            try
+            {
+                cn.Open();
+                SqlCommand cmdInsert = new SqlCommand();
+                cmdInsert.Connection = cn;
+                cmdInsert.CommandType=System.Data.CommandType.Text;
+
+                /*cmdInsert.CommandText="insert into Employees values(5,'vishvjeet',99999,20)";*/
+                cmdInsert.CommandText="insert into Employees values(@EmpNo)";
+
+                cmdInsert.ExecuteNonQuery();
+                Console.WriteLine("succes connection");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally { cn.Close(); }
+        }
+
+        public static void Insert2(Employee obj)
+        {
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString=@"Data Source=(localdb)\ProjectModels; Initial Catalog = ActsDec2023; Integrated Security = True; Connect Timeout = 30; Encrypt=False; Trust Server Certificate=False; Application Intent = ReadWrite; Multi Subnet Failover=False";
+            /*MultipleActiveResulSets=true";*/
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = cn;
+                cmd.CommandType=System.Data.CommandType.Text;
+                cmd.CommandText=$"insert into Employees values({obj.EmpNo},'{obj.Name}',{obj.Basic},{obj.DeptNo})";
+                Console.WriteLine(cmd.CommandText);
+                Console.ReadLine();
+                cmd.ExecuteNonQuery();
+                Console.WriteLine("success");
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            finally { cn.Close(); }
+        }
+
+        public static void insert2(Employee obj)
+        {
+                SqlConnection cn = new SqlConnection();
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = cn;
+                cmd.CommandType=CommandType.Text;
+                cmd.CommandText="insert into Employees values(@empno,@name,@Basic,@DeptNo)";
+                cmd.Parameters.AddWithValue("@empno", obj.EmpNo);
+                cmd.Parameters.AddWithValue("@name", obj.Name);
+                cmd.Parameters.AddWithValue("@Basic", obj.Basic);
+                cmd.Parameters.AddWithValue("@DeptNo", obj.DeptNo);
+
+                cmd.ExecuteNonQuery();
+                Console.WriteLine("success");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                
+                cn.Close();
+            }
+        }
+
+        public static void Insert4(Employee obj)
+        {
+                SqlConnection cn = new SqlConnection();
+            cn.ConnectionString=@"Data Source=(localdb)\ProjectModels; Initial Catalog = ActsDec2023; Integrated Security = True; Connect Timeout = 30;";
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand();
+
+                cmd.Connection = cn;
+                cmd.CommandType=CommandType.StoredProcedure;
+                cmd.CommandText="InsertEmployee";
+                cmd.Parameters.AddWithValue("@EmpNo", obj.EmpNo);
+                cmd.Parameters.AddWithValue("@Name", obj.Name);
+                cmd.Parameters.AddWithValue("@Basic", obj.Basic);
+                cmd.Parameters.AddWithValue("@DeptNo", obj.DeptNo);
+                cmd.ExecuteNonQuery();
+                Console.WriteLine("success insert3");
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                /*SqlConnection cn = new SqlConnection();*/
+                cn.Close();
+            }
+        }
+        
+        
+
+        public class Employee
+        {
+            public int EmpNo { get; set; }
+            public string Name { get; set; }
+            public decimal Basic { get; set; }
+
+            public int DeptNo { get; set; }
+
+            public Employee(int empNo, string name, decimal basic, int deptNo)
+            {
+                EmpNo = empNo;
+                Name = name;
+                Basic = basic;
+                DeptNo = deptNo;
+            }
+
+        }
+    }
+}
