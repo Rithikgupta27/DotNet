@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Data;
 using System.Security.Cryptography;
 
-namespace day9
+namespace day1
 {
     internal class Program
     {
